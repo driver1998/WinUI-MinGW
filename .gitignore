@@ -1,0 +1,9 @@
+*.res
+*.o
+*.exe
+*.dll
+
+winui-mingw/*.winmd
+winui-mingw/cppwinrt
+winui-mingw/cppwinrt-headers
+winui-mingw/winappsdk/**
