@@ -33,7 +33,7 @@ Currently you'll need to install the same version of the Windows App Runtime for
 ## What works
 
 - XAML layout (load in **runtime** only)
-- Data binding with `ICustomPropertyProvider` (see `MainWindowViewModel.cpp` on how to implement this, it sucks but eh)
+- Data binding with `ICustomPropertyProvider` (see `MainWindowViewModel.cpp` and `Property.hpp` on how to implement this, it sucks but eh)
 - `ICommand`
 - Setting events from code-behind
 
