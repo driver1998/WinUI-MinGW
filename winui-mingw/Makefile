@@ -7,11 +7,13 @@ LDFLAGS=-mwindows -static
 
 all: winui-mingw.exe
 
+HEADERS= Property.hpp
+
 cppwinrt-headers:
 	cppwinrt -pch . -input references/Windows.winmd -input winappsdk/lib/uap10.0 -input winappsdk/lib/uap10.0.18362 -output cppwinrt
 	touch cppwinrt-headers
 
-%.o: %.cpp %.h cppwinrt-headers
+%.o: %.cpp %.h ${HEADERS} cppwinrt-headers
 	${CXX} -c ${CXXFLAGS} ${INCLUDES} $< -o $@
 
 main.o: main.cpp cppwinrt-headers
@@ -20,9 +22,9 @@ main.o: main.cpp cppwinrt-headers
 res.o: app.rc app.manifest
 	${WINDRES} app.rc -o res.o
 
-winui-mingw.exe: App.o MainWindowView.o MainWindowViewModel.o CustomProperty.o SimpleCommand.o main.o res.o
+winui-mingw.exe: App.o MainWindowView.o MainWindowViewModel.o SimpleCommand.o main.o res.o
 	${CXX} $^ ${LIBS} ${LDFLAGS} -o $@
 	cp winappsdk/runtimes/win10-x64/native/Microsoft.WindowsAppRuntime.Bootstrap.dll ./
 
 clean:
-	rm -rf *.exe *.dll *.winmd *.o *.res cppwinrt cppwinrt-headers
+	rm -rf *.exe *.dll *.winmd *.o *.res cppwinrt cppwinrt-headers headers

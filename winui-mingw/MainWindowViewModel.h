@@ -1,40 +1,37 @@
 #pragma once
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Microsoft.UI.Xaml.Input.h>
+#include <functional>
+#include <iostream>
+#include <string_view>
+#include <vector>
 #include <winrt/Microsoft.UI.Xaml.Data.h>
+#include <winrt/Microsoft.UI.Xaml.Input.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/base.h>
+
+#include "Property.hpp"
 
 using namespace winrt::Microsoft::UI::Xaml::Data;
 using namespace winrt::Microsoft::UI::Xaml::Input;
 using namespace winrt::Microsoft::UI::Xaml::Interop;
 using winrt::Windows::UI::Xaml::Interop::TypeName;
 
-namespace winrt::WinUIMinGW::implementation
-{
-    struct MainWindowViewModel : winrt::implements<MainWindowViewModel, ICustomPropertyProvider, INotifyPropertyChanged>
-    {
+namespace winrt::WinUIMinGW::implementation {
+    struct MainWindowViewModel
+        : winrt::implements<MainWindowViewModel, ICustomPropertyProvider, INotifyPropertyChanged>,
+          PropertyObject<MainWindowViewModel> {
         MainWindowViewModel();
 
-        hstring Message();
-        void Message(hstring const& value);
-        hstring UserName();
-        void UserName(hstring const& value);
-        ICommand GreetingCommand();
+        std::function<void(hstring const &name)> onPropertyChanged = [this](hstring const &name) {
+            PropertyChanged.event(*this, PropertyChangedEventArgs{name});
+        };
 
-        winrt::event_token PropertyChanged(PropertyChangedEventHandler const& handler);
-        void PropertyChanged(winrt::event_token const& token) noexcept;
+        Property<hstring> Message{L"Message", winrt::xaml_typename<hstring>(), onPropertyChanged};
+        Property<hstring> UserName{L"UserName", winrt::xaml_typename<hstring>(), onPropertyChanged};
+        Property<ICommand> GreetingCommand{L"GreetingCommand", winrt::xaml_typename<ICommand>(),
+                                           onPropertyChanged};
 
-        ICustomProperty GetCustomProperty(hstring const& name);
-        ICustomProperty GetIndexedProperty(hstring const& name, TypeName const& type);
-        hstring GetStringRepresentation();
-        TypeName Type();
+        std::vector<IProperty *> PropertyList = {&Message, &UserName, &GreetingCommand};
 
-        private:
-        hstring m_message;
-        hstring m_userName;
-        ICommand m_greetingCommand;
-        winrt::event<PropertyChangedEventHandler> m_propertyChangedEvent;
-        
-        static std::map<hstring, ICustomProperty> m_propertyMap;
+        Event<PropertyChangedEventHandler> PropertyChanged;
     };
-}
+} // namespace winrt::WinUIMinGW::implementation
